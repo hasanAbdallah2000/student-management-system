@@ -2,15 +2,7 @@
 import usersRepository from '../repositories/users.repository.js';
 import bcrypt from 'bcryptjs';
 
-/**
- * SERVICE LAYER - USERS
- * The service layer contains business logic and validation rules.
- * It sits between the controller and repository layers.
- * - Validates data before sending it to the database
- * - Transforms data if needed
- * - Contains business rules
- * - Does NOT handle HTTP requests/responses (that's the controller's job)
- */
+
 class UsersService {
     /**
      * Get all users
@@ -21,6 +13,64 @@ class UsersService {
         // db.execute() returns [rows, fields], we only need rows
         const [users] = await usersRepository.findAll();
         return users;
+    }
+
+    async getTeachers() {
+      const [rows] = await usersRepository.findTeachers();
+      return rows;
+    }
+
+    async teacherHasCourses(userId) {
+      const [rows] = await usersRepository.countTeacherCourses(userId);
+      return rows[0].count > 0;
+    }
+
+    async getTeacherCourses(id){
+
+      const userId = Number(id);
+      if (!Number.isInteger(userId) || userId < 1){
+        throw new Error("Id must be positive integer");
+      }
+
+      const user = await this.getUserById(userId);
+      if (!user){
+        throw new Error("Selected user is not a teacher");
+      }
+
+      const [allCourses] = await usersRepository.findAllCourses();
+      const [assigned] = await usersRepository.findTeacherCourseIds(userId);
+
+      return { 
+        courses: allCourses,
+        assignedCourseIds: assigned.map((row) => row.course_id),
+      };
+    }
+
+    async assignTeacherCourses(id, courseIds = []){
+
+      const userId = Number(id);
+      if (!Number.isInteger(userId) || userId < 1){
+        throw new Error("Id must be a positive integer");
+      }
+
+      const user = await this.getUserById(userId);
+      if (!user){
+        throw new Error (`User with id ${userId} is not found`);
+      }
+
+      if (user.role !== "teacher"){
+        throw new Error("Selected user is not a teacher");
+      }
+
+      if (!Array.isArray(courseIds)){
+        throw new Error("courseIds must be an array");
+      }
+
+      await usersRepository.deleteTeacherCourses(userId);
+
+      for(const courseId of courseIds){
+        await usersRepository.assignCourseToTeacher(userId, courseId);
+      }
     }
 
     /**
@@ -41,6 +91,61 @@ class UsersService {
         // Return the first user or null if not found
         return user.length > 0 ? user[0] : null;
     }
+    async updateUserById(id, { email, fullName, role, avatarUrl }) {
+  const userId = Number(id);
+
+  if (!Number.isInteger(userId) || userId < 1) {
+    throw new Error("Id must be a positive integer");
+  }
+
+  // لازم المستخدم يكون موجود
+  const existing = await this.getUserById(userId);
+  if (!existing) {
+    throw new Error(`User with id ${userId} is not found`);
+  }
+
+  // role validation (إذا انبعتت)
+  if (role !== undefined) {
+    const allowedRoles = ["admin", "student", "teacher"];
+    if (!allowedRoles.includes(role)) {
+      throw new Error("Invalid role provided");
+    }
+  }
+
+  // email duplicate check (إذا انبعتت + تغيّرت)
+  if (email !== undefined && email !== existing.email) {
+    const [found] = await usersRepository.findByEmail(email);
+    if (found && found.length > 0) {
+      throw new Error("A user with this email already exists");
+    }
+  }
+
+  // جهّز fields بأسماء أعمدة DB
+  const fieldsToUpdate = {
+    email: email ?? undefined,
+    full_name: fullName ?? undefined,
+    role: role ?? undefined,
+    avatar_url: avatarUrl ?? undefined,
+  };
+
+  const [result] = await usersRepository.updateUser(userId, fieldsToUpdate);
+
+  // إذا ما في ولا field انبعت => ما بصير شي
+  if (!result || result.affectedRows === 0) {
+    // ما نرمي error هون… بس رجّع نفس المستخدم أو رجّع updated (حسب ذوقك)
+    return existing;
+  }
+
+  // رجّع المستخدم بعد التعديل
+  const updated = await this.getUserById(userId);
+  return updated;
+}
+
+async getTeachers() {
+  const [rows] = await usersRepository.findTeachers();
+
+  return rows;
+}
 
     /**
      * Delete a user
@@ -60,6 +165,7 @@ class UsersService {
         // Return number of rows affected (0 if not found, 1 if deleted)
         return result.affectedRows;
     }
+        
 
     /**
      * Create a new user (admin or student).

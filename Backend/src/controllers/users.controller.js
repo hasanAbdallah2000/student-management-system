@@ -1,5 +1,7 @@
 // Import the users service for business logic
 import usersService from '../services/users.service.js';
+import ApiError from '../util/ApiError.js';
+import { asyncHandler } from '../middlewares/asyncHandler.js';
 
 /**
  * CONTROLLER LAYER - USERS
@@ -14,30 +16,66 @@ class UsersController {
      * Get all users
      * Handles GET /users
      */
-    async getAllUsers(req, res) {
-        try {
-            // Call service to get all users
-            const users = await usersService.getAllUsers();
-            
-            // Check if any users were found
-            if (users.length < 1) {
-                return res.status(404).json({
-                    error: 'No users found in the database.'
-                });
-            }
-            
-            // Return success response with users data
-            return res.status(200).json({ users });
-        } catch (error) {
-            // Log error for debugging
-            console.error(error);
-            
-            // Return error response
-            return res.status(500).json({
-                error: 'Server Error, please try again.'
+    getAllUsers = asyncHandler(async (req, res) => {
+    const users = await usersService.getAllUsers();
+
+         return res.status(200).json({
+            success: true,
+            data: users || [],
+            count: (users || []).length,
+             });
+        });
+
+         getTeachers = asyncHandler(async (req, res) => {
+        const teachers = await usersService.getTeachers();
+
+        return res.status(200).json({
+            success: true,
+            data: teachers || [],
+            count: (teachers || []).length,
+        });
+        });
+
+        getTeachersCourses = asyncHandler(async (req, res) => {
+            const { id } = req.params;
+            const data = await usersService.getTeacherCourses(id);
+
+            return res.status(200).json({
+                success: true,
+                data,
             });
-        }
-    }
+        });
+        
+        assignTeacherCourses =asyncHandler(async (req, res) => {
+            const { id } = req.params;
+            const {courseIds} = req.body;
+
+            await usersService.assignTeacherCourses(id, courseIds || []);
+
+            return res.status(200).json({
+                success : true,
+                message : "Teacher courses update successfully",
+            });
+        });
+
+        updateUserById = asyncHandler(async (req, res) => {
+        const { id } = req.params;
+
+        const { email, fullName, role, avatarUrl } = req.body;
+
+        const updatedUser = await usersService.updateUserById(id, {
+            email,
+            fullName,
+            role,
+            avatarUrl,
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "User updated successfully",
+            data: updatedUser,
+        });
+        });
 
     /**
      * Get a single user by ID
@@ -85,6 +123,15 @@ class UsersController {
             const { id } = req.params;
             
             // Call service to delete user
+            // check if teacher has courses
+            const hasCourses = await usersService.teacherHasCourses(id);
+
+            if (hasCourses) {
+            return res.status(409).json({
+                error: "Cannot delete teacher because they are assigned to courses"
+            });
+            }
+
             const affectedRows = await usersService.deleteUser(id);
 
             // Check if user was found and deleted
@@ -112,6 +159,24 @@ class UsersController {
             });
         }
     }
+        updateUserById = asyncHandler(async (req, res) => {
+        const { id } = req.params;
+
+        const { fullName, email, role, avatarUrl } = req.body;
+
+        const updated = await usersService.updateUserById(id, {
+            fullName,
+            email,
+            role,
+            avatarUrl,
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "User updated successfully",
+            data: updated,
+        });
+        });
 
     /**
      * Create a new user (admin or student)
@@ -119,13 +184,13 @@ class UsersController {
      */
     async createUser(req, res) {
         try {
-            const { email, password, fullName, role, avatarUrl } = req.body;
+            const { email, password, fullName, full_name, role, avatarUrl } = req.body;
 
             // Delegate to service to perform validation and creation
             const newUserId = await usersService.createUser({
                 email,
                 password,
-                fullName,
+                fullName : fullName || full_name,
                 role,
                 avatarUrl
             });

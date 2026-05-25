@@ -34,6 +34,7 @@ class CoursesRepository {
      * @param {number} credits - The number of credits (default: 3)
      * @returns {Promise} - Returns a promise with the insert result
      */
+
     async create(code, name, credits) {
         const sql = 'INSERT INTO courses (code, name, credits) VALUES (?, ?, ?)';
         return await db.execute(sql, [code, name, credits]);
@@ -47,6 +48,7 @@ class CoursesRepository {
      * @param {number} credits - The updated number of credits
      * @returns {Promise} - Returns a promise with the update result
      */
+
     async update(id, code, name, credits) {
         const sql = 'UPDATE courses SET code = ?, name = ?, credits = ? WHERE id = ?';
         return await db.execute(sql, [code, name, credits, id]);
@@ -61,17 +63,27 @@ class CoursesRepository {
         const sql = 'DELETE FROM courses WHERE id = ?';
         return await db.execute(sql, [id]);
     }
+
     async countAll() {
   const [rows] = await db.execute("SELECT COUNT(*) AS count FROM courses");
   return rows[0].count;
 }
+
     async countByTeacher(teacherId) {
   const [rows] = await db.execute(
     "SELECT COUNT(*) AS count FROM courses WHERE teacher_id = ?",
     [teacherId]
   );
   return rows[0].count;
-}   
+}
+
+async countEnrollmentsByCourseId(courseId) {
+    const [rows] = await db.execute(
+      "SELECT COUNT(*) AS count FROM enrollments WHERE course_id = ?",
+      [courseId]
+    );
+    return rows[0].count;
+  }
 }
 
 // Export a singleton instance of the CoursesRepository class

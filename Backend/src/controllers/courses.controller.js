@@ -1,5 +1,7 @@
 // Import the courses service for business logic
 import coursesService from '../services/courses.service.js';
+import { asyncHandler } from '../middlewares/asyncHandler.js';
+import ApiError from '../util/ApiError.js';
 
 /**
  * CONTROLLER LAYER - COURSES
@@ -159,8 +161,7 @@ class CoursesController {
      * Delete a course
      * Handles DELETE /courses/:id
      */
-    async destroyCourseById(req, res) {
-        try {
+    destroyCourseById = asyncHandler(async(req, res) => {
             // Extract ID from URL parameters
             const { id } = req.params;
             
@@ -168,30 +169,13 @@ class CoursesController {
             const affectedRows = await coursesService.deleteCourse(id);
 
             // Check if course was found and deleted
-            if (affectedRows === 0) {
-                return res.status(404).json({
-                    error: `Course with id ${id} is not found`
-                });
-            }
+            if (!affectedRows){ throw new ApiError(404, `Course with id ${id} is not found`, "COURSE_NOT_FOUND");
+}
+           return res.status(200).json({ success: "true" , message: "course deleted",});
 
             // Return success response
-            return res.status(200).json({
-                message: `Course with id ${id} was successfully deleted`
             });
-        } catch (error) {
-            console.error(error);
-            
-            // Handle validation errors
-            if (error.message === 'Id must be a positive integer') {
-                return res.status(400).json({ error: error.message });
-            }
-            
-            // Handle unexpected errors
-            return res.status(500).json({
-                error: 'Server Error, please try again.'
-            });
-        }
-    }
+    
 }
 
 // Export a singleton instance of the CoursesController class

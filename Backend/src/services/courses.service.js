@@ -1,5 +1,6 @@
 // Import the courses repository for database operations
 import coursesRepository from '../repositories/courses.repository.js';
+import ApiError from '../util/ApiError.js';
 
 /**
  * SERVICE LAYER - COURSES
@@ -90,19 +91,21 @@ class CoursesService {
      * @returns {Promise<number>} - Number of rows affected (0 or 1)
      * @throws {Error} - If ID is invalid
      */
-    async deleteCourse(id) {
-        // Validation: ID must be a positive integer
-        if (id < 1) {
-            throw new Error('Id must be a positive integer');
-        }
-        
-        // Delete course from database
-        const [result] = await coursesRepository.deleteCourse(id);
-        
-        // Return number of rows affected (0 if not found, 1 if deleted)
-        return result.affectedRows;
-    }
-}
 
+  async deleteCourse(id) {
+    if (Number(id) < 1) throw new ApiError(400, "Id must be a positive integer");
+
+    const enrollCount = await coursesRepository.countEnrollmentsByCourseId(id);
+    if (enrollCount > 0) {
+      throw new ApiError(
+        409,
+        "Cannot delete this course because it has enrollments.",
+        "COURSE_HAS_ENROLLMENTS"
+      );
+    }
+    const [result] = await coursesRepository.deleteCourse(id);
+    return result.affectedRows;
+}
+}
 // Export a singleton instance of the CoursesService class
 export default new CoursesService();

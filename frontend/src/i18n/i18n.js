@@ -1,7 +1,7 @@
 export const dictionary = {
   en: {
     app: "Admin Dashboard",
-    login: "Admin Login",
+    login: "Sign in",
     email: "Email",
     password: "Password",
     signIn: "Sign in",
@@ -29,7 +29,16 @@ export const dictionary = {
     arabic: "Arabic",
     english: "English",
     unauthorized: "Unauthorized. Please sign in again.",
-    serverError: "Server error. Please try again."
+    serverError: "Server error. Please try again.",
+    confirmDelete: "Confirm Delete",
+    deleteCourseConfirm: "Are you sure you want to delete this course?",
+    deleted: "Deleted successfully",
+    deleting: "Deleting...",
+    created: "Created successfully",
+    updated: "Updated successfully",
+    deleteUserConfirm: "Are you sure you want to delete this user?",
+    confirmDelete: "Confirm Delete",
+    deleting: "Deleting..."
   },
   ar: {
     app: "لوحة التحكم",
@@ -61,6 +70,15 @@ export const dictionary = {
     arabic: "عربي",
     english: "إنكليزي",
     unauthorized: "غير مصرح. الرجاء تسجيل الدخول من جديد.",
-    serverError: "خطأ في السيرفر. جرّب مرة ثانية."
+    serverError: "خطأ في السيرفر. جرّب مرة ثانية.",
+    confirmDelete: "تأكيد الحذف",
+    deleteCourseConfirm: "هل أنت متأكد أنك تريد حذف هذا المقرر؟",
+    deleted: "تم الحذف بنجاح",
+    deleting: "جارٍ الحذف...",
+    created: "تم الإنشاء بنجاح",
+    updated: "تم التحديث بنجاح",
+    deleteUserConfirm: "هل أنت متأكد أنك تريد حذف هذا المستخدم؟",
+    confirmDelete: "تأكيد الحذف",
+    deleting: "جاري الحذف..."
   }
 };

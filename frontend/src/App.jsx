@@ -7,6 +7,7 @@ import DashboardPage from "./pages/DashboardPage";
 import UsersPage from "./pages/UsersPage";
 import CoursesPage from "./pages/CoursesPage";
 import EnrollmentsPage from "./pages/EnrollmentsPage";
+import TeachersPage from "./pages/TeachersPage";
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
         <Route path="users" element={<UsersPage />} />
         <Route path="courses" element={<CoursesPage />} />
         <Route path="enrollments" element={<EnrollmentsPage />} />
+        <Route path="teachers" element={<TeachersPage />} />
       </Route>
 
       <Route path="*" element={<LoginPage />} />

@@ -5,9 +5,6 @@ import { useLang } from "../i18n/lang.jsx";
 import { getUser } from "../api/auth.api.js"; // فوق مع imports
 
 
-const role = getUser()?.role || "student";
-const canManage = role === "admin" || role === "teacher";
-  
 
 function Modal({ open, title, children, onClose }) {
   if (!open) return null;
@@ -26,6 +23,8 @@ function Modal({ open, title, children, onClose }) {
 
 export default function CoursesPage() {
   const { t } = useLang();
+  const role = getUser()?.role || "student";
+  const canManage = role === "admin" || role === "teacher";
   const [items, setItems] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
   const [toast, setToast] = React.useState(null);
@@ -36,6 +35,10 @@ export default function CoursesPage() {
   const [code, setCode] = React.useState("");
   const [name, setName] = React.useState("");
   const [credits, setCredits] = React.useState(3);
+
+  const [confirmOpen, setConfirmOpen] = React.useState(false);
+  const [toDelete, setToDelete] = React.useState(null);
+  const [deleting, setDeleting] = React.useState(false);
 
   async function load() {
     setLoading(true);
@@ -73,10 +76,10 @@ export default function CoursesPage() {
     try {
       if (editing?.id) {
         await api.put(`${endpoints.courses}/${editing.id}`, { code, name, credits: Number(credits) });
-        setToast({ type: "success", message: "Updated" });
+        setToast({ type: "success", message: t("updated") || "Updated" });
       } else {
         await api.post(endpoints.courses, { code, name, credits: Number(credits) });
-        setToast({ type: "success", message: "Created" });
+        setToast({ type: "success", message: t("created") || "Created" });
       }
       setOpen(false);
       load();
@@ -86,17 +89,26 @@ export default function CoursesPage() {
     }
   }
 
-  async function del(id) {
-    if (!confirm("Delete this course?")) return;
-    try {
-      await api.delete(`${endpoints.courses}/${id}`);
-      setToast({ type: "success", message: "Deleted" });
-      load();
-    } catch (err) {
-      const msg = err?.response?.data?.error || t("serverError");
-      setToast({ type: "error", message: msg });
-    }
+  async function confirmDelete() {
+  if (!toDelete?.id) return;
+  setDeleting(true);
+  setToast(null);
+  try {
+    await api.delete(`${endpoints.courses}/${toDelete.id}`);
+    setToast({ type: "success", message: t("deleted") || "Deleted" });
+    setConfirmOpen(false);
+    setToDelete(null);
+    load();
+  } catch (err) {
+    const msg = err?.response?.data?.message || 
+    err?.response?.data?.error || 
+    t("serverError");
+    setToast({ type: "error", message: msg });
+  } finally {
+    setDeleting(false);
   }
+}
+
 
   return (
     <div className="space-y-4">
@@ -136,7 +148,11 @@ export default function CoursesPage() {
                   {canManage && (
                   <td className="p-3">
                   <button className="btn-ghost" onClick={() => openEdit(c)}>{t("edit")}</button>
-                  <button className="btn-ghost" onClick={() => del(c.id)}>{t("delete")}</button>
+                  <button
+                   className="btn-ghost"
+                   onClick={() => { setToDelete(c); setConfirmOpen(true); }}>
+                  {t("delete")}
+                  </button>
                    </td>
                   )}
 
@@ -168,6 +184,40 @@ export default function CoursesPage() {
           </div>
         </form>
       </Modal>
+
+      <Modal
+  open={confirmOpen}
+  title={t("confirmDelete") || "Confirm Delete"}
+  onClose={() => { if (!deleting) { setConfirmOpen(false); setToDelete(null); } }}
+>
+  <div className="space-y-4">
+    <p className="text-slate-600">
+      {t("deleteCourseConfirm") || "Are you sure you want to delete this course?"}
+      <br />
+      <span className="font-semibold text-slate-800">{toDelete?.name} ({toDelete?.code})</span>
+    </p>
+
+    <div className="flex items-center justify-end gap-2">
+      <button
+        type="button"
+        className="btn-ghost"
+        disabled={deleting}
+        onClick={() => { setConfirmOpen(false); setToDelete(null); }}
+      >
+        {t("cancel")}
+      </button>
+
+      <button
+        type="button"
+        className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
+        disabled={deleting}
+        onClick={confirmDelete}
+      >
+        {deleting ? (t("deleting") || "Deleting...") : (t("delete") || "Delete")}
+      </button>
+    </div>
+  </div>
+</Modal>
     </div>
   );
 }

@@ -39,7 +39,7 @@ router.get('/course/:courseId', authenticate, authorizeRoles('teacher' , 'admin'
 router.post('/', authenticate, authorizeRoles('admin'), enrollmentsController.createEnrollment.bind(enrollmentsController));
 
 // PATCH /enrollments/:id/grade - Update grade for an enrollment
-router.patch('/:id/grade', authenticate, authorizeRoles('teacher'), enrollmentsController.updateEnrollmentGrade.bind(enrollmentsController));
+router.patch('/:id/grade', authenticate, authorizeRoles('teacher', 'admin'), enrollmentsController.updateEnrollmentGrade.bind(enrollmentsController));
 
 // DELETE /enrollments/:id - Delete an enrollment
 router.delete('/:id', authenticate, authorizeRoles('admin'), enrollmentsController.deleteEnrollment.bind(enrollmentsController));

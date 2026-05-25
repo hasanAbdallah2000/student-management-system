@@ -42,7 +42,7 @@ export default function LoginPage() {
       <div className="card w-full max-w-md p-6">
         <div className="mb-6">
           <div className="text-2xl font-semibold">{t("login")}</div>
-          <div className="text-sm text-slate-500 mt-1">React + Tailwind • Node/Express API</div>
+          <div className="text-sm text-slate-500 mt-1">Student Management System</div>
         </div>
 
         <form className="space-y-4" onSubmit={onSubmit}>
@@ -60,9 +60,6 @@ export default function LoginPage() {
             {loading ? t("signingIn") : t("signIn")}
           </button>
 
-          <div className="text-xs text-slate-500">
-            Tip: set <b>VITE_API_BASE_URL</b> in <b>.env</b> (frontend) if your backend runs on another port.
-          </div>
         </form>
       </div>
     </div>

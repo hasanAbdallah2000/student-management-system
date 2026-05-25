@@ -12,23 +12,24 @@ class EnrollmentsController {
      * Handles GET /enrollments
      */
     async getAllEnrollments(req, res) {
-        try {
-            const enrollments = await enrollmentsService.getAllEnrollments();
+  try {
+    const enrollments = await enrollmentsService.getAllEnrollments();
 
-            if (enrollments.length < 1) {
-                return res.status(404).json({
-                    error: 'No enrollments found in the database.'
-                });
-            }
-
-            return res.status(200).json({ enrollments });
-        } catch (error) {
-            console.error(error);
-            return res.status(500).json({
-                error: 'Server Error, please try again.'
-            });
-        }
-    }
+    // ✅ always 200, even if []
+    return res.status(200).json({
+      success: true,
+      data: enrollments,
+      count: enrollments.length
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Server Error, please try again.",
+      errorCode: "INTERNAL_SERVER_ERROR"
+    });
+  }
+}
 
     /**
      * Get a single enrollment by ID

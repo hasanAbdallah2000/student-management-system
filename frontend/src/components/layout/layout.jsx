@@ -32,11 +32,12 @@ export default function Layout() {
           <NavLink to="/" className={linkClass}>{t("dashboard")}</NavLink>
 
           {role === "admin" && (
-            <>
-              <NavLink to="/users" className={linkClass}>{t("users")}</NavLink>
-              <NavLink to="/courses" className={linkClass}>{t("courses")}</NavLink>
-              <NavLink to="/enrollments" className={linkClass}>{t("enrollments")}</NavLink>
-            </>
+          <>
+            <NavLink to="/users" className={linkClass}>{t("users")}</NavLink>
+            <NavLink to="/teachers" className={linkClass}>Teachers</NavLink>
+            <NavLink to="/courses" className={linkClass}>{t("courses")}</NavLink>
+            <NavLink to="/enrollments" className={linkClass}>{t("enrollments")}</NavLink>
+          </>
           )}
 
           {role === "teacher" && (

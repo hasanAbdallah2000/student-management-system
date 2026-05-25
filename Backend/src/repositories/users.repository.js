@@ -38,6 +38,43 @@ class UsersRepository {
         return await db.execute(sql, [id]);
     }
 
+    async findTeachers() {
+        const sql = `
+        SELECT u.id , u.email , u.full_name , u.role , u.avatar_url, 
+        COUNT(tc.course_id) AS assigned_courses FROM users u
+        LEFT JOIN teacher_courses tc ON tc.teacher_id = u.id
+        WHERE u.role = 'teacher'
+        GROUP BY u.id , u.email , u.full_name , u.role , u.avatar_url
+        ORDER BY u.id DESC
+        `;
+        return await db.execute(sql);
+    }
+
+    async countTeacherCourses(teacherId) { 
+        const sql = `SELECT COUNT(*) AS count FROM teacher_courses WHERE teacher_id = ?`;
+        return await db.execute(sql, [teacherId]);
+    }
+
+    async findAllCourses() {
+        const sql = `SELECT id ,name FROM courses ORDER BY id DESC`;
+        return await db.execute(sql);
+    }
+
+    async findTeacherCourseIds(teacherId){
+        const sql = `SELECT course_id FROM teacher_courses WHERE teacher_id = ?`;
+        return await db.execute(sql , [teacherId]);
+    }
+
+    async deleteTeacherCourses(teacherId){
+        const sql = `DELETE FROM teacher_courses WHERE teacher_id = ?`;
+        return await db.execute(sql , [teacherId]);
+    }
+
+    async assignCourseToTeacher(teacherId , courseId){
+        const sql = `INSERT INTO teacher_courses (teacher_id, course_id) VALUES (? , ?)`;
+        return await db.execute(sql, [teacherId , courseId]);
+    }
+
     /**
      * Retrieve a single user by email including the password hash.
      * This is only used during authentication and should never be exposed elsewhere.
@@ -74,6 +111,28 @@ class UsersRepository {
         `;
         return await db.execute(sql, [email, passwordHash, fullName, role, avatarUrl ?? null]);
     }
+
+    async findByEmail(email) {
+  const sql = 'SELECT id, email, full_name, role, avatar_url, created_at, updated_at FROM users WHERE email = ? LIMIT 1';
+  return await db.execute(sql, [email]);
+}
+async updateUser(id, fields) {
+  // fields example: { email, full_name, role, avatar_url }
+  const keys = Object.keys(fields).filter((k) => fields[k] !== undefined);
+
+  if (keys.length === 0) {
+    // nothing to update
+    return [{ affectedRows: 0 }];
+  }
+
+  const setClause = keys.map((k) => `${k} = ?`).join(", ");
+  const values = keys.map((k) => fields[k]);
+
+  const sql = `UPDATE users SET ${setClause} WHERE id = ?`;
+  return await db.execute(sql, [...values, id]);
+}
+
+
     async countAll() {
   const [rows] = await db.execute("SELECT COUNT(*) AS count FROM users");
   return rows[0].count;
