@@ -64,21 +64,12 @@ export default function TeachersPage() {
     const res = await api.get("/users/teachers");
     const teachersData = Array.isArray(res.data?.data) ? res.data.data : [];
 
-    const teachersWithCourses = await Promise.all(
-      teachersData.map(async (t) => {
-        try {
-          const courseRes = await api.get(`/users/teachers/${t.id}/courses`);
-          return {
-            ...t,
-            courses: courseRes.data?.data?.courses || [],
-          };
-        } catch {
-          return { ...t, courses: [] };
-        }
-      })
+    setTeachers(
+      teachersData.map((t) => ({
+        ...t,
+        courses: t.courses ?? [],
+      }))
     );
-
-    setTeachers(teachersWithCourses);
   } catch (err) {
     setTeachers([]);
     showToast("Failed to load teachers", "error");
@@ -332,6 +323,7 @@ export default function TeachersPage() {
               ) : (
                 filteredTeachers.map((teacher, index) => (
                   <tr key={teacher.id} className="border-t border-slate-200">
+                    {console.log("teacher:", teacher)}
                     <td className="px-4 py-3 text-sm text-slate-600">
                       {index + 1}
                     </td>
@@ -346,22 +338,25 @@ export default function TeachersPage() {
                       {teacher.email}
                     </td>
 
-                  <td className="px-4 py-3 text-slate-700">
-                    {Array.isArray(teacher.courses) && teacher.courses.length > 0 ? (
-                      <div className="flex flex-wrap gap-1">
-                        {teacher.courses.map((course) => (
-                          <span
-                            key={course.id}
-                            className="px-2 py-1 text-xs rounded-full bg-green-50 text-green-700"
-                          >
-                            {course.name}
-                          </span>
-                        ))}
-                      </div>
-                    ) : (
-                      <span className="text-slate-400 text-sm">No courses</span>
-                    )}
-                  </td>
+                 <td className="px-4 py-3 text-slate-700">
+                  <div className="flex items-center justify-between gap-2">
+                    
+                    <span className="text-sm text-slate-600">
+                      {teacher.assigned_courses > 0
+                        ? `${teacher.assigned_courses} assigned`
+                        : "0 assigned"}
+                    </span>
+
+                    <button
+                      className="text-sm text-indigo-600 hover:underline"
+                      onClick={() => openAssignModal(teacher)}
+                    >
+                      Assign Courses
+                    </button>
+
+                  </div>
+                </td>
+                
 
                     <td className="px-4 py-3">
                       <span className="inline-flex items-center rounded-full bg-indigo-50 text-indigo-700 px-2.5 py-1 text-xs font-medium">
@@ -371,13 +366,6 @@ export default function TeachersPage() {
 
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-
-                        <button
-                          className="btn-ghost"
-                          onClick={() => openAssignModal(teacher)}
-                        >
-                          Assign Courses
-                        </button>
 
                         <button
                           className="btn-ghost"
