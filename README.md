@@ -126,11 +126,17 @@ VITE_API_BASE_URL=
 ### 📊 Dashboard
 ![Dashboard](./screenshots/dashboard.png)
 
-### 🎓 Students Page
-![Students](./screenshots/students.png)
+### 🎓 Users Page
+![Users](./screenshots/Users.png)
+
+### 🎓 Teachers Page
+![Teachers](./screenshots/Teachers.png)
 
 ### 📚 Courses Page
 ![Courses](./screenshots/courses.png)
+
+### 📚 Enrollments Page
+![Enrollments](./screenshots/Enrollments.png)
 
 ---
 
