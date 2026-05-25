@@ -121,10 +121,10 @@ VITE_API_BASE_URL=
 ## 📸 Screenshots
 
 ### 🔐 Login Page
-![Login](./screenshots/login.png)
+![Login](./screenshots/Login.png)
 
 ### 📊 Dashboard
-![Dashboard](./screenshots/dashboard.png)
+![Dashboard](./screenshots/Dashboard.png)
 
 ### 🎓 Users Page
 ![Users](./screenshots/Users.png)
@@ -133,7 +133,7 @@ VITE_API_BASE_URL=
 ![Teachers](./screenshots/Teachers.png)
 
 ### 📚 Courses Page
-![Courses](./screenshots/courses.png)
+![Courses](./screenshots/Courses.png)
 
 ### 📚 Enrollments Page
 ![Enrollments](./screenshots/Enrollments.png)
