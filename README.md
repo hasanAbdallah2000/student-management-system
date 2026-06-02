@@ -71,7 +71,7 @@ services/
 
 ### 1️⃣ Clone the repository
 ```bash
-git clone https://github.com/your-username/student-management-system.git
+git clone https://github.com/hasanAbdallah2000/student-management-system.git
 cd student-management-system
 ```
 
