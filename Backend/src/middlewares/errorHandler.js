@@ -4,7 +4,6 @@ export default function errorHandler(err, req, res, next) {
 
   console.error("ERROR:", err);
 
-  // 🔹 Custom ApiError
   if (err instanceof ApiError) {
     return res.status(err.statusCode).json({
       success: false,
@@ -14,7 +13,6 @@ export default function errorHandler(err, req, res, next) {
     });
   }
 
-  // 🔹 MySQL Foreign Key constraint (course has enrollments)
   if (err.code === "ER_ROW_IS_REFERENCED_2") {
     return res.status(409).json({
       success: false,
@@ -24,7 +22,6 @@ export default function errorHandler(err, req, res, next) {
     });
   }
 
-  // 🔹 Default fallback
   return res.status(500).json({
     success: false,
     message: "Something went wrong. Please try again.",

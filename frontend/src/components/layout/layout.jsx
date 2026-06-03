@@ -50,9 +50,6 @@ export default function Layout() {
           {role === "student" && (
             <>
               <NavLink to="/courses" className={linkClass}>{t("courses")}</NavLink>
-              {/* إذا عندك صفحة الطالب لاحقًا:
-              <NavLink to="/my-courses" className={linkClass}>My Courses</NavLink>
-              */}
             </>
           )}
         </nav>

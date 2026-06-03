@@ -4,7 +4,6 @@ import { authenticate, authorizeRoles } from "../middlewares/auth.middleware.js"
 
 const router = Router();
 
-// ✅ let preflight pass
 router.options("/stats", (req, res) => res.sendStatus(204));
 
 router.get(

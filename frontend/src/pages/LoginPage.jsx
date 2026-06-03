@@ -19,7 +19,6 @@ export default function LoginPage() {
     setToast(null);
     try {
       const res = await api.post(endpoints.login, { email, password });
-      // expected: { message, token, user }
       const { token, user } = res.data || {};
       setAuth({ token, user });
       nav("/");

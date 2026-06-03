@@ -1,14 +1,8 @@
-// Load environment variables from .env file
 import 'dotenv/config';
 
-// Import mysql2 with promise support for async/await usage
 import mysql from 'mysql2/promise';
 
-/**
- * DATABASE CONNECTION CLASS
- * Manages the MySQL connection pool using a singleton pattern.
- * Provides a clean interface for database operations.
- */
+
 class Database {
     constructor() {
         if (Database.instance) {
@@ -16,7 +10,6 @@ class Database {
         }
 
         // Create a connection pool to the MySQL database
-        // A pool manages multiple connections efficiently and reuses them
         this.pool = mysql.createPool({
             host: process.env.DB_HOST || '127.0.0.1',              // Database server address
             port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 3306, // Database port
@@ -31,7 +24,6 @@ class Database {
     }
 
     /**
-     * Execute a query with parameters
      * @param {string} sql - SQL query string
      * @param {Array} params - Query parameters
      * @returns {Promise} - Query result
@@ -41,7 +33,6 @@ class Database {
     }
 
     /**
-     * Get the underlying pool for advanced operations
      * @returns {Pool} - MySQL connection pool
      */
     getPool() {
@@ -49,6 +40,5 @@ class Database {
     }
 }
 
-// Export a singleton instance of the Database class
 const db = new Database();
 export default db;

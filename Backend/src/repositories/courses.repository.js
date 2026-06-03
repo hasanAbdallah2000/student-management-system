@@ -1,12 +1,6 @@
-// Import the database connection pool
 import db from '../database/connection.js';
 
-/**
- * REPOSITORY LAYER - COURSES
- * The repository layer is responsible for direct database operations.
- * It contains only SQL queries and database interactions - NO business logic.
- * Think of it as the "data access layer" that talks to the database.
- */
+
 class CoursesRepository {
     /**
      * Retrieve all courses from the database
@@ -18,7 +12,6 @@ class CoursesRepository {
     }
 
     /**
-     * Retrieve a single course by its ID
      * @param {number} id - The course ID to search for
      * @returns {Promise} - Returns a promise with the course record or empty array
      */
@@ -41,7 +34,6 @@ class CoursesRepository {
     }
 
     /**
-     * Update an existing course in the database
      * @param {number} id - The course ID to update
      * @param {string} code - The updated course code
      * @param {string} name - The updated course name
@@ -55,7 +47,6 @@ class CoursesRepository {
     }
 
     /**
-     * Delete a course from the database
      * @param {number} id - The course ID to delete
      * @returns {Promise} - Returns a promise with the delete result
      */
@@ -86,5 +77,4 @@ async countEnrollmentsByCourseId(courseId) {
   }
 }
 
-// Export a singleton instance of the CoursesRepository class
 export default new CoursesRepository();

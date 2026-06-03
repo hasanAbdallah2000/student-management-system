@@ -1,21 +1,12 @@
-// Import the enrollments service for business logic
 import enrollmentsService from '../services/enrollments.service.js';
 
-/**
- * CONTROLLER LAYER - ENROLLMENTS
- * Handles HTTP requests and responses for enrollment operations.
- * Routes requests to the service layer and formats responses.
- */
+
 class EnrollmentsController {
-    /**
-     * Get all enrollments (Admin/Teacher only)
-     * Handles GET /enrollments
-     */
+    
     async getAllEnrollments(req, res) {
   try {
     const enrollments = await enrollmentsService.getAllEnrollments();
 
-    // ✅ always 200, even if []
     return res.status(200).json({
       success: true,
       data: enrollments,
@@ -31,10 +22,7 @@ class EnrollmentsController {
   }
 }
 
-    /**
-     * Get a single enrollment by ID
-     * Handles GET /enrollments/:id
-     */
+   
     async getEnrollmentById(req, res) {
         try {
             const { id } = req.params;
@@ -60,11 +48,7 @@ class EnrollmentsController {
         }
     }
 
-    /**
-     * Get all enrollments for a specific student
-     * Handles GET /enrollments/student/:studentId
-     * Students can only see their own enrollments
-     */
+   
     async getEnrollmentsByStudent(req, res) {
         try {
             const { studentId } = req.params;
@@ -96,15 +80,11 @@ class EnrollmentsController {
         }
     }
 
-    /**
-     * Get all enrollments for the current authenticated student
-     * Handles GET /enrollments/my-courses
-     */
+    
     async getMyEnrollments(req, res) {
         try {
             const studentId = req.user.id;
 
-            // Only students can access this endpoint
             if (req.user.role !== 'student') {
                 return res.status(403).json({
                     error: 'This endpoint is only for students'
@@ -125,10 +105,7 @@ class EnrollmentsController {
         }
     }
 
-    /**
-     * Get all students enrolled in a specific course
-     * Handles GET /enrollments/course/:courseId
-     */
+    
     async getEnrollmentsByCourse(req, res) {
         try {
             const { courseId } = req.params;
@@ -151,10 +128,7 @@ class EnrollmentsController {
         }
     }
 
-    /**
-     * Create a new enrollment (Admin/Teacher only)
-     * Handles POST /enrollments
-     */
+   
     async createEnrollment(req, res) {
         try {
             const { student_id, course_id, enrolled_at } = req.body;
@@ -172,7 +146,6 @@ class EnrollmentsController {
         } catch (error) {
             console.error(error);
 
-            // Handle validation errors
             if (
                 error.message === 'Student ID and Course ID are required' ||
                 error.message === 'Student ID must be a positive integer' ||
@@ -184,7 +157,6 @@ class EnrollmentsController {
                 return res.status(400).json({ error: error.message });
             }
 
-            // Handle duplicate enrollment
             if (error.message === 'Student is already enrolled in this course') {
                 return res.status(409).json({ error: error.message });
             }
@@ -195,10 +167,7 @@ class EnrollmentsController {
         }
     }
 
-    /**
-     * Update grade for an enrollment (Admin/Teacher only)
-     * Handles PATCH /enrollments/:id/grade
-     */
+    
     async updateEnrollmentGrade(req, res) {
         try {
             const { id } = req.params;
@@ -218,7 +187,6 @@ class EnrollmentsController {
         } catch (error) {
             console.error(error);
 
-            // Handle validation errors
             if (
                 error.message === 'Enrollment ID must be a positive integer' ||
                 error.message === 'Grade is required' ||
@@ -233,10 +201,7 @@ class EnrollmentsController {
         }
     }
 
-    /**
-     * Delete an enrollment (Admin/Teacher only)
-     * Handles DELETE /enrollments/:id
-     */
+    
     async deleteEnrollment(req, res) {
         try {
             const { id } = req.params;
@@ -264,10 +229,7 @@ class EnrollmentsController {
         }
     }
 
-    /**
-     * Get statistics for a student's enrollments
-     * Handles GET /enrollments/student/:studentId/statistics
-     */
+    
     async getStudentStatistics(req, res) {
         try {
             const { studentId } = req.params;
@@ -302,15 +264,11 @@ class EnrollmentsController {
         }
     }
 
-    /**
-     * Get statistics for the current authenticated student
-     * Handles GET /enrollments/my-statistics
-     */
+    
     async getMyStatistics(req, res) {
         try {
             const studentId = req.user.id;
 
-            // Only students can access this endpoint
             if (req.user.role !== 'student') {
                 return res.status(403).json({
                     error: 'This endpoint is only for students'
@@ -335,5 +293,4 @@ class EnrollmentsController {
     }
 }
 
-// Export a singleton instance of the EnrollmentsController class
 export default new EnrollmentsController();

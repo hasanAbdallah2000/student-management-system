@@ -1,15 +1,9 @@
-// Import the database connection pool
 import db from '../database/connection.js';
 
 
-/**
- * REPOSITORY LAYER - ENROLLMENTS
- * Handles all database operations for enrollments.
- * Contains only SQL queries - NO business logic.
- */
+
 class EnrollmentsRepository {
     /**
-     * Get all enrollments with student and course details
      * @returns {Promise} - Returns all enrollments with joined user and course data
      */
     async findAll() {
@@ -36,7 +30,6 @@ class EnrollmentsRepository {
     }
 
     /**
-     * Get a single enrollment by ID
      * @param {number} id - The enrollment ID
      * @returns {Promise} - Returns the enrollment with student and course details
      */
@@ -64,7 +57,6 @@ class EnrollmentsRepository {
     }
 
     /**
-     * Get all enrollments for a specific student
      * @param {number} studentId - The student's user ID
      * @returns {Promise} - Returns all enrollments for the student
      */
@@ -90,7 +82,6 @@ class EnrollmentsRepository {
     }
 
     /**
-     * Get all enrollments for a specific course
      * @param {number} courseId - The course ID
      * @returns {Promise} - Returns all students enrolled in the course
      */
@@ -115,7 +106,6 @@ class EnrollmentsRepository {
     }
 
     /**
-     * Check if an enrollment already exists
      * @param {number} studentId - The student's user ID
      * @param {number} courseId - The course ID
      * @returns {Promise} - Returns the enrollment if it exists
@@ -223,5 +213,4 @@ async countCoursesByStudent(studentId) {
 
 }
 
-// Export a singleton instance of the EnrollmentsRepository class
 export default new EnrollmentsRepository();
